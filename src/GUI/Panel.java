@@ -1,42 +1,16 @@
 package GUI;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import javax.swing.*;
+
+import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
+import java.io.*;
+import java.util.Collections;
+import javax.sound.sampled.*;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.DataLine;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JTextField;
-import javax.swing.Timer;
-
-import GUI.Paneel.KnopHandler;
-import GUI.Paneel.SchuifHandler;
-import GUI.Paneel.ToetsenbordHandler;
-import plane.Plane;
+import objects.*;
 
 class Paneel extends JPanel {
 
@@ -52,7 +26,37 @@ class Paneel extends JPanel {
 
     private Timer timer;
 
+    private Plane plane;
+
+    private Raket raket;
+    
+    private Levens levens;
+    
+    private Punten punten;
+    
+    private Level level;
+    
+    private Pauze pauze;
+
+    private PlainTegenstander plaintegenstander;
+    
+    private RaketTegenstander rakettegenstander;
+
+    private ArrayList<Raket> raketten;
+
+    private ArrayList<PlainTegenstander> plaintegenstanders;
+    
+    private ArrayList<RaketTegenstander> rakettegenstanders;
+    
+    private ArrayList<String> highscores = new ArrayList<String>();
+
     private Random rand = new Random();
+    
+    private int teller, rand1, rand2, rand3, rand4;
+    
+    private int start;
+    
+    private Boolean opgeslagen;
     
     private AudioInputStream streamExplosion, streamBackground, streamDead, streamLaunch;
     private AudioFormat formatExplosion, formatBackground, formatDead, formatLaunch;
@@ -71,30 +75,56 @@ class Paneel extends JPanel {
     private double moeilijkheidsgraad;
     private int puntenMultiplier;
     
-    public Paneel() {        
+    public Paneel() {
+        raketten = new ArrayList<Raket>();
+        plaintegenstanders = new ArrayList<PlainTegenstander>();
+        rakettegenstanders = new ArrayList<RaketTegenstander>();
+
+        plain = new Plain(0, 300);
+        raket = new Raket(0, 337);
+        levens = new Levens();
+        punten = new Punten();
+        level = new Level();
+        pauze = new Pauze();
+        pauze.setActief(true);
+        plaintegenstander = new PlainTegenstander(1000, 300, 1);
+        rakettegenstander = new RaketTegenstander(1000, 300, 1);
         
-    	
-    	//Images
-        bgImg = new ImageIcon(GUI.class.getResource("/images/spaceImpactBackground.jpg"));
-        imgStart = new ImageIcon(GUI.class.getResource("/images/imgStart.png"));
-        imgStartHover = new ImageIcon(GUI.class.getResource("/images/imgStartHover.png"));
-        imgKiesVliegtuig = new ImageIcon(GUI.class.getResource("/images/imgKiesVliegtuig.png"));
-        imgKiesVliegtuigHover = new ImageIcon(GUI.class.getResource("/images/imgKiesVliegtuigHover.png"));
-        imgHighscores = new ImageIcon(GUI.class.getResource("/images/imgHighscores.png"));
-        imgHighscoresHover = new ImageIcon(GUI.class.getResource("/images/imgHighscoresHover.png"));
+        opgeslagen = false;
         
-        imgVliegtuig01 = new ImageIcon(GUI.class.getResource("/images/plain01.png"));
-        imgVliegtuig02 = new ImageIcon(GUI.class.getResource("/images/plain02.png"));
-        imgVliegtuig03 = new ImageIcon(GUI.class.getResource("/images/plain03.png"));
-        imgVliegtuig04 = new ImageIcon(GUI.class.getResource("/images/plain04.png"));
+        bgImg = new ImageIcon(SpaceImpactV2.class.getResource("/images/spaceImpactBackground.jpg"));
+        imgStart = new ImageIcon(SpaceImpactV2.class.getResource("/images/imgStart.png"));
+        imgStartHover = new ImageIcon(SpaceImpactV2.class.getResource("/images/imgStartHover.png"));
+        imgKiesVliegtuig = new ImageIcon(SpaceImpactV2.class.getResource("/images/imgKiesVliegtuig.png"));
+        imgKiesVliegtuigHover = new ImageIcon(SpaceImpactV2.class.getResource("/images/imgKiesVliegtuigHover.png"));
+        imgHighscores = new ImageIcon(SpaceImpactV2.class.getResource("/images/imgHighscores.png"));
+        imgHighscoresHover = new ImageIcon(SpaceImpactV2.class.getResource("/images/imgHighscoresHover.png"));
         
-        imgTerug = new ImageIcon(GUI.class.getResource("/images/imgTerug.png"));
-        imgTerugHover = new ImageIcon(GUI.class.getResource("/images/imgTerugHover.png"));
+        imgVliegtuig01 = new ImageIcon(SpaceImpactV2.class.getResource("/images/plain01.png"));
+        imgVliegtuig02 = new ImageIcon(SpaceImpactV2.class.getResource("/images/plain02.png"));
+        imgVliegtuig03 = new ImageIcon(SpaceImpactV2.class.getResource("/images/plain03.png"));
+        imgVliegtuig04 = new ImageIcon(SpaceImpactV2.class.getResource("/images/plain04.png"));
         
-        imgOpslaan = new ImageIcon(GUI.class.getResource("/images/imgOpslaan.png"));
-        imgOpslaanHover = new ImageIcon(GUI.class.getResource("/images/imgOpslaanHover.png"));
+        imgTerug = new ImageIcon(SpaceImpactV2.class.getResource("/images/imgTerug.png"));
+        imgTerugHover = new ImageIcon(SpaceImpactV2.class.getResource("/images/imgTerugHover.png"));
         
-        Plane plane;
+        imgOpslaan = new ImageIcon(SpaceImpactV2.class.getResource("/images/imgOpslaan.png"));
+        imgOpslaanHover = new ImageIcon(SpaceImpactV2.class.getResource("/images/imgOpslaanHover.png"));
+        
+
+        timer = new Timer(10, new TimerHandler());
+        
+        teller = 0;
+        rand1 = 200;
+        rand2 = 600;
+        rand3 = 800;
+        rand4 = 1000;
+        
+        start = 0;
+        
+        moeilijkheidsgraad = 1;
+        puntenMultiplier = 3;
+        
         
         ActionListener handler = new KnopHandler();
         
@@ -256,23 +286,478 @@ class Paneel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         bgImg.paintIcon(this, g, 0, 0);
+        levens.teken(g);
+        punten.teken(g);
+        level.teken(g);
+
+        for (Raket r : raketten) {
+            if (r.isActief()) {
+                r.teken(g);
+            }
+        }
         
-        //Paintcomponent shit check original
+        plain.teken(g);
+        
+        for (RaketTegenstander rt : rakettegenstanders) {
+            if (rt.isActief()) {
+                rt.teken(g);
+            }
+        }
+
+        for (PlainTegenstander p : plaintegenstanders) {
+            if (p.isActief()) {
+                p.teken(g);
+            }
+        }
+        
+        if (levens.getAantal() == 0) {
+            levens.gedaan(g);
+            plain.tekenDood(g);
+            scrbMoeilijkheidsgraad.setEnabled(true);
+            if (opgeslagen == false) {
+                labelOpslaan.setVisible(true);
+                txtOpslaan.setVisible(true);
+                btnOpslaan.setVisible(true);
+            }
+            
+        }
+        
+        if (pauze.isActief() == true) {
+            pauze.teken(g);
+        }
+        
+        if (highscores.size() > 5) {
+            g.setColor(Color.YELLOW);
+            g.setFont(new Font("TimesRoman", Font.BOLD, 40));
+            g.drawString("HIGHSCORES", 245, 150);
+            for (int aantalScores = highscores.size() - 1; aantalScores >= highscores.size() - 5; aantalScores--) {
+                g.drawString(highscores.get(aantalScores), 245, 245 - (aantalScores - highscores.size() + 1) * 55);
+            }
+            highscores.clear();
+            
+        }
+        if (highscores.size() > 0 && highscores.size() <= 5) {
+            g.setColor(Color.YELLOW);
+            g.setFont(new Font("TimesRoman", Font.BOLD, 50));
+            g.drawString("HIGHSCORES", 245, 150);
+            for (int aantalScores = highscores.size() - 1; aantalScores >= 0; aantalScores--) {
+                g.drawString(highscores.get(aantalScores), 245, 245 - (aantalScores - highscores.size() + 1) * 55);
+            }
+            highscores.clear();
+        }
 
         this.requestFocusInWindow();
     }
 
+    public void clean(){
+        ArrayList<PlainTegenstander> plaintegenstandersNew = new ArrayList<PlainTegenstander>();
+        for (PlainTegenstander p: plaintegenstanders){
+            if (p.isActief()){
+                plaintegenstandersNew.add(p);
+            }
+        }
+        plaintegenstanders = plaintegenstandersNew;
+        
+        ArrayList<Raket> rakettenNew = new ArrayList<Raket>();
+        for (Raket r: raketten){
+            if (r.isActief()){
+                rakettenNew.add(r);
+            }
+        }
+        raketten = rakettenNew;
+        
+        ArrayList<RaketTegenstander> raketTegenstandersNew = new ArrayList<RaketTegenstander>();
+        for (RaketTegenstander rt: rakettegenstanders){
+            if (rt.isActief()){
+                raketTegenstandersNew.add(rt);
+            }
+        }
+        rakettegenstanders = raketTegenstandersNew;
+        
+    }
     
+    public void botsing() {
+        for (Raket r : raketten) {
+            if (r.isActief()) {
+                for (PlainTegenstander p : plaintegenstanders) {
+                    if (p.isActief()) {
+                        if ((r.getX()) + r.getBreedte() >= p.getX()
+                                && r.getX() + r.getBreedte() <= p.getX() + p.getGrootte()
+                                && r.getY() + r.getHoogte() > p.getY()
+                                && r.getY() < p.getY() + p.getGrootte()) {
+                            
+                            try {
+                                streamExplosion = AudioSystem.getAudioInputStream(SpaceImpactV2.class.getResource("/sounds/explosion.wav"));
+                                formatExplosion = streamExplosion.getFormat();
+                                infoExplosion = new DataLine.Info(Clip.class, formatExplosion);
+                                clipExplosion = (Clip) AudioSystem.getLine(infoExplosion);
+                                clipExplosion.open(streamExplosion);
+                                clipExplosion.start();
+                            }
+                            
+                            catch (Exception e) {
+                                
+                            }
+                            
+                            if (p.getType() == 1) {
+                                r.setActief(false);
+                                p.setActief(false);
+                                punten.setAantal(punten.getAantal() + 1 * puntenMultiplier);
+                            }
+                            if (p.getType() == 2) {
+                                r.setActief(false);
+                                p.setType(1);
+                                punten.setAantal(punten.getAantal() + 1);
+                            }
+                            if (p.getType() == 3) {
+                                r.setActief(false);
+                                p.setActief(false);
+                                punten.setAantal(punten.getAantal() + 5 * puntenMultiplier);
+                            }
+                            if (p.getType() == 4) {
+                                r.setActief(false);
+                                p.setActief(false);
+                                punten.setAantal(punten.getAantal() + 15 * puntenMultiplier);
+                            }
+                            
+                            
+                        }
+                    }
+                }
+            }
+        }
+        for (PlainTegenstander p : plaintegenstanders) {
+            if (p.isActief()) {
+                if (p.getY() + p.getGrootte() >= plain.getY()
+                        && p.getY() <= plain.getY() + plain.getGrootte()
+                        && p.getX() <= plain.getGrootte())
+                {
+                    try {
+                        streamExplosion = AudioSystem.getAudioInputStream(SpaceImpactV2.class.getResource("/sounds/explosion.wav"));
+                        formatExplosion = streamExplosion.getFormat();
+                        infoExplosion = new DataLine.Info(Clip.class, formatExplosion);
+                        clipExplosion = (Clip) AudioSystem.getLine(infoExplosion);
+                        clipExplosion.open(streamExplosion);
+                        clipExplosion.start();
+                    }
+                    
+                    catch (Exception e){
+                        
+                    }
+                    
+                    levens.setAantal(levens.getAantal() - 1);
+                    p.setActief(false);
+                }
+            }
+        }
+        for (RaketTegenstander rt : rakettegenstanders) {
+            if (rt.isActief()) {
+                if (rt.getY() + rt.getHoogte() >= plain.getY()
+                        && rt.getY() <= plain.getY() + plain.getGrootte()
+                        && rt.getX() <= plain.getGrootte())
+                {
+                    try {
+                        streamExplosion = AudioSystem.getAudioInputStream(SpaceImpactV2.class.getResource("/sounds/explosion.wav"));
+                        formatExplosion = streamExplosion.getFormat();
+                        infoExplosion = new DataLine.Info(Clip.class, formatExplosion);
+                        clipExplosion = (Clip) AudioSystem.getLine(infoExplosion);
+                        clipExplosion.open(streamExplosion);
+                        clipExplosion.start();
+                    }
+                    
+                    catch (Exception e) {
+                        
+                    }
+                    
+                    levens.setAantal(levens.getAantal() - 1);
+                    rt.setActief(false);
+                }
+                
+            }
+        }
+        
+        if (levens.getAantal() <= 0)
+        {
+            
+            try {
+                streamDead = AudioSystem.getAudioInputStream(SpaceImpactV2.class.getResource("/sounds/dead.wav"));
+                formatDead = streamDead.getFormat();
+                infoDead = new DataLine.Info(Clip.class, formatDead);
+                clipDead = (Clip) AudioSystem.getLine(infoDead);
+                clipDead.open(streamDead);
+                clipDead.start();
+            }
+            
+            catch (Exception e) {
+                
+            }
+            
+            timer.stop();
+            clipBackground.stop();
+            clipExplosion.stop();
+            repaint();
+        }
+    }
+
+    public void beweeg() {
+        for (Raket r : raketten) {
+            r.beweeg();
+            if (r.getX() > 1000) {
+                r.setActief(false);
+            }
+        }
+        for (PlainTegenstander p : plaintegenstanders) {
+            p.beweeg();
+            p.setTijd(p.getTijd() + 1);
+            if (p.getX() < -90) {
+                p.setActief(false);
+            }
+            
+            if (p.getType() == 4) {
+                p.beweeg();
+                if (p.getTijd() == 120) {
+                    rakettegenstanders.add(new RaketTegenstander(p.getX(), p.getY() + p.getGrootte() / 2 - 8, 4));
+                    try {
+                        streamLaunch = AudioSystem.getAudioInputStream(SpaceImpactV2.class.getResource("/sounds/launch.wav"));
+                        formatLaunch = streamLaunch.getFormat();
+                        infoLaunch = new DataLine.Info(Clip.class, formatLaunch);
+                        clipLaunch = (Clip) AudioSystem.getLine(infoLaunch);
+                        clipLaunch.open(streamLaunch);
+                        clipLaunch.start();
+                    }
+                    
+                    catch (Exception e) {
+                        
+                    }
+                    p.setTijd(20);
+                }
+            }
+            
+            else if (p.getType() == 3) {
+                if (p.getTijd() == 110) {
+                    rakettegenstanders.add(new RaketTegenstander(p.getX(), p.getY() + p.getGrootte() / 2 - 8, 2));
+                    rakettegenstanders.add(new RaketTegenstander(p.getX(), p.getY() + p.getGrootte() / 2 - 8, 3));
+                    try {
+                        streamLaunch = AudioSystem.getAudioInputStream(SpaceImpactV2.class.getResource("/sounds/launch.wav"));
+                        formatLaunch = streamLaunch.getFormat();
+                        infoLaunch = new DataLine.Info(Clip.class, formatLaunch);
+                        clipLaunch = (Clip) AudioSystem.getLine(infoLaunch);
+                        clipLaunch.open(streamLaunch);
+                        clipLaunch.start();
+                    }
+                    
+                    catch (Exception e) {
+                        
+                    }
+                    p.setTijd(-100);
+                }
+            }
+            
+            else {
+                if (p.getTijd() == 200) {
+                    rakettegenstanders.add(new RaketTegenstander(p.getX(), p.getY() + p.getGrootte() / 2 - 8, 1));
+                    try {
+                        streamLaunch = AudioSystem.getAudioInputStream(SpaceImpactV2.class.getResource("/sounds/launch.wav"));
+                        formatLaunch = streamLaunch.getFormat();
+                        infoLaunch = new DataLine.Info(Clip.class, formatLaunch);
+                        clipLaunch = (Clip) AudioSystem.getLine(infoLaunch);
+                        clipLaunch.open(streamLaunch);
+                        clipLaunch.start();
+                    }
+                    
+                    catch (Exception e) {
+                        
+                    }
+                    p.setTijd(0);
+                }
+            }
+        }
+        for (RaketTegenstander rt : rakettegenstanders) {
+            rt.beweeg();
+            if (rt.getType() == 2) {
+                rt.beweegOmhoog();
+            }
+            if (rt.getType() == 3) {
+                rt.beweegOmlaag();
+            }
+            if (rt.getType() == 4) {
+                rt.beweeg();
+            }
+            if (rt.getX() < -52) {
+                rt.setActief(false);
+            }
+        }
+    }
+
+    class TimerHandler implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) { 
+            if (teller < 30) {
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand1)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 1));
+                    teller+=1;
+                }
+            }
+            
+            if (teller >= 30 && teller < 60) {
+                level.setAantal(2);
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand1)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 1));
+                    teller+=1;
+                }
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand2)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 2));
+                    teller+=1;
+                }
+            }
+            
+            if (teller >= 60 && teller < 90) {
+                level.setAantal(3);
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand1)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 1));
+                    teller+=1;
+                }
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand2)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 2));
+                    teller+=1;
+                }
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand3)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 3));
+                    teller+=1;
+                }
+            }
+            if (teller >= 90 && teller < 120) {
+                level.setAantal(4);
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand1)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 1));
+                    teller+=1;
+                }
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand2)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 2));
+                    teller+=1;
+                }
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand3)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 3));
+                    teller+=1;
+                }
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand4)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 4));
+                    teller+=1;
+                }
+            }
+            
+            if (teller >= 120) {
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand1)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 1));
+                    teller+=1;
+                }
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand2)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 2));
+                    teller+=1;
+                }
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand3)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 3));
+                    teller+=1;
+                }
+                if (rand.nextInt((int)(moeilijkheidsgraad * rand4)) == 1) {
+                    plaintegenstanders.add(new PlainTegenstander(1000, rand.nextInt(600), 4));
+                    teller+=1;
+                }
+            }
+            
+            if (teller == 120) {
+                level.setAantal(5);
+                rand1 = 400;
+                rand2 = 400;
+                rand3 = 600;
+                rand4 = 800;
+            }
+            
+            if (teller == 150) {
+                level.setAantal(6);
+                rand1 = 400;
+                rand2 = 400;
+                rand3 = 600;
+                rand4 = 600;
+            }
+            
+            if (teller == 180) {
+                level.setAantal(7);
+                rand1 = 400;
+                rand2 = 400;
+                rand3 = 400;
+                rand4 = 600;
+            }
+            
+            if (teller == 210) {
+                level.setAantal(8);
+                rand1 = 400;
+                rand2 = 400;
+                rand3 = 400;
+                rand4 = 400;
+            }
+            
+            if (teller == 240) {
+                level.setAantal(9);
+                rand1 = 300;
+                rand2 = 300;
+                rand3 = 300;
+                rand4 = 300;
+            }
+            
+            if (teller == 270) {
+                level.setAantal(10);
+                rand1 = 200;
+                rand2 = 200;
+                rand3 = 200;
+                rand4 = 200;
+            }
+            
+            if (teller == 300) {
+                level.setAantal(11);
+                rand1 = 150;
+                rand2 = 150;
+                rand3 = 150;
+                rand4 = 150;
+            }
+            
+            if (teller == 330) {
+                level.setAantal(12);
+                rand1 = 100;
+                rand2 = 100;
+                rand3 = 100;
+                rand4 = 100;
+            }
+            
+            if (teller == 360) {
+                level.setAantal(13);
+                rand1 = 50;
+                rand2 = 50;
+                rand3 = 50;
+                rand4 = 50;
+            }
+            
+            beweeg();
+            botsing();
+            clean();
+            
+            System.out.println("# raketten:" + raketten.size());
+            System.out.println("# plaintegenstanders:" + plaintegenstanders.size());
+            System.out.println("# rakettegenstanders:" + rakettegenstanders.size());
+            repaint();
+            
+        }
+    }
+
     class ToetsenbordHandler extends KeyAdapter {
 
         public void keyPressed(KeyEvent ke) {
-            Plane plane;
-			switch (ke.getKeyCode()) {
+            switch (ke.getKeyCode()) {
                 case KeyEvent.VK_DOWN:
-                    plane.omlaag();
+                    plain.omlaag();
                     break;
                 case KeyEvent.VK_UP:
-                	plane.omhoog();
+                    plain.omhoog();
                     break;
             }
         }
@@ -280,11 +765,9 @@ class Paneel extends JPanel {
         public void keyTyped(KeyEvent ke) {
             switch (ke.getKeyChar()) {
                 case KeyEvent.VK_SPACE:
-                	
-                	//TODO spawnRAKET
-                    
+                    raketten.add(new Raket(0, plain.getY() + 37));
                     try {
-                        streamLaunch = AudioSystem.getAudioInputStream(GUI.class.getResource("/sounds/launch.wav"));
+                        streamLaunch = AudioSystem.getAudioInputStream(SpaceImpactV2.class.getResource("/sounds/launch.wav"));
                         formatLaunch = streamLaunch.getFormat();
                         infoLaunch = new DataLine.Info(Clip.class, formatLaunch);
                         clipLaunch = (Clip) AudioSystem.getLine(infoLaunch);
@@ -386,7 +869,7 @@ class Paneel extends JPanel {
                 
                 timer.start();
                 try {
-                    streamBackground = AudioSystem.getAudioInputStream(GUI.class.getResource("/sounds/background.wav"));
+                    streamBackground = AudioSystem.getAudioInputStream(SpaceImpactV2.class.getResource("/sounds/background.wav"));
                     formatBackground = streamBackground.getFormat();
                     infoBackground = new DataLine.Info(Clip.class, formatBackground);
                     clipBackground = (Clip) AudioSystem.getLine(infoBackground);

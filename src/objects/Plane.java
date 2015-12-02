@@ -1,4 +1,4 @@
-package plane;
+package objects;
 
 import java.awt.Graphics;
 import javax.swing.ImageIcon;
