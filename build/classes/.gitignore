@@ -1,6 +1,5 @@
 /GUI/
-/images/
-/sounds/
-/spaceimpactv2/
-/plane/
+/handlers/
+/engine/
 /objects/
+/images/
