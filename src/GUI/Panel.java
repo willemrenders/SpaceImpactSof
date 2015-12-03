@@ -18,6 +18,7 @@ class Paneel extends JPanel {
     private GameEngine gameEngine;
 	private ImageIcon imgBackground;
 	private Timer timer;
+	private boolean pauze;
 	
     
     public Paneel() {
@@ -26,6 +27,8 @@ class Paneel extends JPanel {
     	
     	timer = new Timer(10, new TimerHandler());
     	timer.start();
+    	
+    	pauze = false;
     	
     	addKeyListener(new ToetsenbordHandler());
         
@@ -54,6 +57,16 @@ class Paneel extends JPanel {
 	            case KeyEvent.VK_SPACE:
 	            	gameEngine.shoot();
 	                break;
+	            case KeyEvent.VK_ESCAPE:
+	            	if (pauze) {
+	            		pauze = false;
+	            		timer.start();
+	            	}
+	            	else {
+	            		pauze = true;
+	            		timer.stop();
+	            	}
+	            	
 	        }
         }
     }
@@ -64,6 +77,9 @@ class Paneel extends JPanel {
         	gameEngine.moveObjects();
         	gameEngine.cleanAllObjectsOutOfScreen();
 			gameEngine.checkCollisions();
+			if (!gameEngine.stillAlive()) {
+				timer.stop();
+			}
 			gameEngine.checkIfAnyEnemyHasToShoot();
 			gameEngine.checkIfNewEnemyHasToBeMade();
 			repaint();

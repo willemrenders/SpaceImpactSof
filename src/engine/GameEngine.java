@@ -36,6 +36,7 @@ public class GameEngine {
     	score = new Score();
 	}
 	
+	// CHECK ALL COLLISIONS
 	public void checkCollisions() {
 		for (int i = listOfRockets.size() - 1; i >= 0; i--) {
 			// COLLISION ENEMY WITH FRIENDLY ROCKET
@@ -72,6 +73,7 @@ public class GameEngine {
 		}
 	}
 	
+	// DELETE ALL THE OBJECTS THAT WENT OUT OF THE SCREEN
 	public void cleanAllObjectsOutOfScreen() {
 		for (int i = listOfRockets.size() - 1; i >= 0; i--) {
 			if (listOfRockets.get(i).CheckIfFriendly() && listOfRockets.get(i).getX() > 1000) {
@@ -136,6 +138,7 @@ public class GameEngine {
 	public void drawAllObjects(Graphics g) {
 		lives.draw(g);
 		score.draw(g);
+		lives.gedaan(g);
 		
 		for (EnemySpaceShip ess : listOfEnemySpaceShips) {
 			ess.draw(g);
@@ -144,5 +147,15 @@ public class GameEngine {
 			r.draw(g);
 		}
 		spaceShip.draw(g);
+	}
+	
+	// CHECK IF YOU ARE STILL ALIVE
+	public boolean stillAlive() {
+		if (lives.getAmount() > 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 }

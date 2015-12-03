@@ -26,9 +26,11 @@ public class Lives {
     }
     
     public void gedaan(Graphics g) {
-        g.setColor(Color.RED);
-        g.setFont(new Font("TimesRoman", Font.BOLD, 100));
-        g.drawString(note, 215, 375);
+    	if (amount <= 0) {
+    		g.setColor(Color.RED);
+            g.setFont(new Font("TimesRoman", Font.BOLD, 100));
+            g.drawString(note, 215, 375);
+    	}
     }
     
     public void decrease() {
