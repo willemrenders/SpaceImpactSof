@@ -13,22 +13,16 @@ import java.util.Collections;
 import javax.sound.sampled.*;
 
 import objects.*;
-import handlers.*;
 
 class Paneel extends JPanel {
     private GameEngine gameEngine;
 	private ImageIcon imgBackground;
-	//private TimerHandler timerHandler;
-	//private KeyboardHandler keyboardHandler;
-	
 	private Timer timer;
 	
     
     public Paneel() {
     	gameEngine = new GameEngine();
     	imgBackground = new ImageIcon(GUI.class.getResource("/images/Background.jpg"));
-    	//timerHandler = new TimerHandler(gameEngine);
-    	//keyboardHandler = new KeyboardHandler(gameEngine);
     	
     	timer = new Timer(10, new TimerHandler());
     	timer.start();
