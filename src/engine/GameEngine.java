@@ -40,7 +40,7 @@ public class GameEngine {
 	public void checkCollisions() {
 		for (int i = listOfRockets.size() - 1; i >= 0; i--) {
 			// COLLISION ENEMY WITH FRIENDLY ROCKET
-			if (listOfRockets.get(i).CheckIfFriendly()) {
+			if (listOfRockets.get(i).checkIfFriendly()) {
 				for (int j = listOfEnemySpaceShips.size() - 1; j >= 0; j--) {
 					if ((listOfRockets.get(i).getX()) + listOfRockets.get(i).getWidth() >= listOfEnemySpaceShips.get(j).getX()
                             && listOfRockets.get(i).getX() + listOfRockets.get(i).getWidth() <= listOfEnemySpaceShips.get(j).getX() + listOfEnemySpaceShips.get(j).getWidth()
@@ -76,10 +76,10 @@ public class GameEngine {
 	// DELETE ALL THE OBJECTS THAT WENT OUT OF THE SCREEN
 	public void cleanAllObjectsOutOfScreen() {
 		for (int i = listOfRockets.size() - 1; i >= 0; i--) {
-			if (listOfRockets.get(i).CheckIfFriendly() && listOfRockets.get(i).getX() > 1000) {
+			if (listOfRockets.get(i).checkIfFriendly() && listOfRockets.get(i).getX() > 1000) {
 				listOfRockets.remove(i);
 			}
-			else if (!listOfRockets.get(i).CheckIfFriendly() && listOfRockets.get(i).getX() < -listOfRockets.get(i).getWidth()) {
+			else if (!listOfRockets.get(i).checkIfFriendly() && listOfRockets.get(i).getX() < -listOfRockets.get(i).getWidth()) {
 				listOfRockets.remove(i);
 			}
 		}

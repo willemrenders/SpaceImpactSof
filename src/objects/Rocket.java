@@ -16,7 +16,7 @@ public class Rocket extends MovingObject {
 		x += dx;
 	}
 	
-	public boolean CheckIfFriendly() {
+	public boolean checkIfFriendly() {
 		return friendly;
 	}
 }
