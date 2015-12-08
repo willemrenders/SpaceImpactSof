@@ -128,8 +128,8 @@ public class GameEngine {
 	
 	// CHECK IF A NEW ENEMY NEEDS TO BE MADE
 	public void checkIfNewEnemyHasToBeMade() {
-		if (rand.nextInt(500) == 1) {
-			enemySpaceShip = new EnemySpaceShip(1000, rand.nextInt(630), 90, 90, -1, imgEnemySpaceShip, 200);
+		if (rand.nextInt(300) == 1) {
+			enemySpaceShip = new EnemySpaceShip(1000, rand.nextInt(600), 90, 90, -1, imgEnemySpaceShip, 200);
 			listOfEnemySpaceShips.add(enemySpaceShip);
 		}
 	}
